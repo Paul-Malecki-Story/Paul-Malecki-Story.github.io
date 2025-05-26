@@ -313,22 +313,27 @@ tailwind.config = {
         <div class="grid md:grid-cols-2 gap-8 mb-8">
           <div>
             <h3 class="text-xl font-bold text-highlight mb-4">Send a Message</h3>
-            <form id="contact-form" class="max-w-xl mx-auto bg-white dark:bg-darkmode p-8 rounded-lg shadow-lg">
-  <div class="mb-4">
-    <label for="name" class="block text-sm font-medium mb-1">Your Name</label>
-    <input name="name" type="text" id="name" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required>
-  </div>
-  <div class="mb-4">
-    <label for="email" class="block text-sm font-medium mb-1">Email</label>
-    <input name="email" type="email" id="email" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required>
-  </div>
-  <div class="mb-4">
-    <label for="message" class="block text-sm font-medium mb-1">Message</label>
-    <textarea name="message" id="message" rows="4" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required></textarea>
-  </div>
-  <button type="submit" class="bg-button hover:bg-buttonhover text-white font-bold py-2 px-6 rounded transition duration-300 shadow-md hover:shadow-lg">Send Message</button>
-</form>
-<div id="form-status" class="mt-4 text-sm"></div>
+            <form id="contact-form" action="#" method="POST" class="max-w-xl mx-auto bg-white dark:bg-darkmode p-8 rounded-lg shadow-lg">
+              <div class="mb-4">
+                <label for="name" class="block text-sm font-medium mb-1">Your Name</label>
+                <input name="name" type="text" id="name" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required>
+              </div>
+              <div class="mb-4">
+                <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                <input name="email" type="email" id="email" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required>
+              </div>
+              <div class="mb-4">
+                <label for="message" class="block text-sm font-medium mb-1">Message</label>
+                <textarea name="message" id="message" rows="4" class="w-full px-3 py-2 border border-accent rounded focus:outline-none focus:ring-1 focus:ring-highlight" required></textarea>
+              </div>
+              <button type="submit" class="bg-button hover:bg-buttonhover text-white font-bold py-2 px-6 rounded transition duration-300 shadow-md hover:shadow-lg w-full">
+                <span id="submit-text">Send Message</span>
+                <span id="loading-spinner" class="hidden">
+                  <i class="fas fa-spinner fa-spin ml-2"></i>
+                </span>
+              </button>
+            </form>
+            <div id="form-status" class="mt-4 text-sm"></div>
           </div>
           <div>
             <h3 class="text-xl font-bold text-highlight mb-4">Other Contact Methods</h3>
@@ -491,29 +496,63 @@ document.addEventListener('DOMContentLoaded', function() {
       loadContent('home');
     }
   });
-});
 
+  // Contact Form Handling
   const form = document.getElementById('contact-form');
   const statusDiv = document.getElementById('form-status');
+  const submitText = document.getElementById('submit-text');
+  const loadingSpinner = document.getElementById('loading-spinner');
+  
+  // Flag to prevent double submission
+  let isSubmitting = false;
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = new FormData(form);
-
-    fetch("https://script.google.com/macros/s/AKfycbyAL7k9_7yi-YagmdwISh6xKoZKIEaJgKV9xDavX-ipBSMxDQFiV9H8xK7fU9guWSUS9Q/exec", {
-      method: "POST",
-      body: data
-    })
-    .then(response => {
-      statusDiv.textContent = "Message sent successfully!";
-      statusDiv.classList.add("text-green-600");
-      form.reset();
-    })
-    .catch(error => {
+    
+    // Clear previous status
+    statusDiv.textContent = '';
+    statusDiv.className = 'mt-4 text-sm';
+    
+    // Validate form
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    // Show loading state
+    submitText.textContent = 'Sending...';
+    loadingSpinner.classList.remove('hidden');
+    
+    try {
+      const data = new FormData(form);
+      const response = await fetch("https://script.google.com/macros/s/AKfycbyAL7k9_7yi-YagmdwISh6xKoZKIEaJgKV9xDavX-ipBSMxDQFiV9H8xK7fU9guWSUS9Q/exec", {
+        method: "POST",
+        body: data
+      });
+      
+      if (response.ok) {
+        statusDiv.textContent = "Message sent successfully!";
+        statusDiv.className = "mt-4 text-sm text-green-600";
+        form.reset();
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    } catch (error) {
+      console.error('Error:', error);
       statusDiv.textContent = "Something went wrong. Please try again.";
-      statusDiv.classList.add("text-red-600");
-    });
+      statusDiv.className = "mt-4 text-sm text-red-600";
+    } finally {
+      // Reset form state
+      isSubmitting = false;
+      submitText.textContent = "Send Message";
+      loadingSpinner.classList.add('hidden');
+    }
   });
+});
 </script>
 </body>
 </html>
