@@ -381,11 +381,13 @@ tailwind.config = {
 <!-- Footer -->
 <footer class="bg-white text-text py-8 border-t border-accent">
   <div class="container mx-auto px-4">
+    <!-- Only change this div below - keeps all other elements unchanged -->
     <div class="flex flex-col md:flex-row justify-between items-center">
-      <div class="mb-4 md:mb-0">
+      <div class="mb-4 md:mb-0 text-center md:text-left">  <!-- Added text-center md:text-left -->
         <h3 class="text-xl font-serif font-bold text-highlight">Paul Malecki's Journey</h3>
-        <p class="text-accent">Hope • Courage • Love</p>
+        <p class="text-accent mx-auto md:mx-0">Hope • Courage • Love</p>  <!-- Added mx-auto md:mx-0 -->
       </div>
+      <!-- Rest remains exactly the same as original -->
       <div class="flex space-x-6">
         <a href="#" data-target="home" class="hover:text-highlight">Home</a>
         <a href="#" data-target="about" class="hover:text-highlight">About</a>
