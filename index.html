@@ -492,6 +492,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+<script>
+  const form = document.getElementById('contact-form');
+  const statusDiv = document.getElementById('form-status');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    fetch("YOUR_SCRIPT_URL", {
+      method: "POST",
+      body: data
+    })
+    .then(response => {
+      statusDiv.textContent = "Message sent successfully!";
+      statusDiv.classList.add("text-green-600");
+      form.reset();
+    })
+    .catch(error => {
+      statusDiv.textContent = "Something went wrong. Please try again.";
+      statusDiv.classList.add("text-red-600");
+    });
+  });
 </script>
 </body>
 </html>
